@@ -6,4 +6,4 @@ We assume that the vcf files have already been filtered to only include the 2,50
 
 # Step 1: Generate singleton files
 
-Here we'll generate singleton files for each of the five superpopulations, along with a singleton file for all 2,504 unrelated samples in the 1000G sample.
+Here we'll generate singleton files for each of the five super-populations, along with a singleton file for all 2,504 unrelated samples in the 1000G sample. We do this using a chain of calls to `bcftools view` and `vcftools --singletons`. Batch scripts to perform these operations are in the `src` directory in the scripts named `step1_singletons_{POP}.sh`.
