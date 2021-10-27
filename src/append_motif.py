@@ -68,6 +68,7 @@ with open(singleton_file) as fp:
             'cat': cat,
             'alt': alt,
             'subject': subject,
+            'ref': ref,
             'motif_full': motif_full,
             'cat_full': cat_full
         }
