@@ -17,4 +17,20 @@ wget -O- ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15
 samtools faidx reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
 ```
 
-The script which appends each singleton with its motif is `src/append_motif.py`, and the batch scripts `step2_annotate_{POP}.sh` will submit slurm jobs for each chromosome for the given population.
+The script which appends each singleton with its motif is `src/append_motif.py`, and the batch scripts `step2_annotate_{POP}.sh` will submit slurm jobs for each chromosome for the given population. The output files will be headerless csvs with the following columns:
+
+1. Chromosome
+2. Position
+3. Original Motif
+4. Simple subtype (REF>ALT)
+5. ALT
+6. Sample ID
+7. REF
+8. Full Motif (motif and its reverse complement)
+9. Condensed sub-type
+
+# Step 3: Sample Control Observations
+
+The scripts to sample 5 controls per singleton are `src/control_sample_at.py` and `src/control_sample_gc.py`. Scripts to submit batch jobs to slurm are available in files with the prefix `step3_sample` (also in the src directory).
+
+NOTE: if using a reference genome other than hg38, you might need to change the variable ref_prefix in the main function definition of the two scripts to match the chromosome names in the fasta file (i.e. in hg37, chromosomes are named only by their number, where as in hg38 each chromosome is prefixed with "chr", e.g. chr1, chr2, ...)
