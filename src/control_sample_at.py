@@ -95,11 +95,18 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
         newSeq = subseq[(ix - bp):(ix+bp+1)]
-        while not re.search("[ATCG]{11}", newSeq): # THIS CHANGED!
+        if not re.search("[NYRATCG]{21}", newSeq): # THIS CHANGED!
             #print(pos)
             sites.remove(ix)
-            ix = random.choice(sites)
-            newSeq = subseq[(ix - bp):(ix+bp+1)]
+            try:
+                if c_direction == -1:
+                    sites1.remove(ix)
+                else:
+                    sites2.remove(ix)
+            except ValueError: 
+                print("EYORE: Could not remove index {} from list of sites".format(ix))
+                print("Newseq = {}".format(newSeq))
+            continue
         if c_direction == -1:
             distance = window + bp - ix
         else:
@@ -116,7 +123,7 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
             'motif2':motif2
         }
         newlist.append(entry)
-        if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
+        if c_direction == -1:
             sites1.remove(ix)
         else:
             sites2.remove(ix)
