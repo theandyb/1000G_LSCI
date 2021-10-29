@@ -11,7 +11,7 @@ def full_motif(motif, ref):
     if ref in ['A','C']:
         final = "{}({})".format(motif, motif_rc)
     else:
-        final = "{}({})".format(motif, motif_rc)
+        final = "{}({})".format(motif_rc, motif)
     return final
 
 def main(ref_prefix = "chr"):
