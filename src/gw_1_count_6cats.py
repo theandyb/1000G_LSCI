@@ -1,7 +1,6 @@
 from pyfaidx import Fasta
 import pandas as pd
 import sys
-ref_file = "/net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 def count_string(nuc_string, window, result_tables):
   rc_dict = {"A":"T", "C":"G", "G":"C", "T":"A"}

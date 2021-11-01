@@ -68,3 +68,11 @@ awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_AT.
 awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_TA.txt
 awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.txt
 ```
+
+# Step 5: Genome-wide Background Rates - Single Position Models
+
+The scripts to generate counts based on the reference genome are `gw_1_count3cats.py` and `gw_1_count_6cats.py`. Batch scripts to submit jobs to slurm are `step5_gw_1_count_3cat_batch.sh` and `step5_gw_1_count_6cat_batch.sh`.
+
+# Step 6: Genome-wide Background Rates - Two Postion Models
+
+The script to generate counts based on the reference genome is `gw_2_count_6cats.py`, with batch script to submit jobs to slurm `step6_gw_2_6cats.sh`.
