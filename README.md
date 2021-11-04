@@ -78,3 +78,11 @@ After this, run the script `step5_combine_chromosomes.R` to combine the per-chro
 # Step 6: Genome-wide Background Rates - Two Postion Models
 
 The script to generate counts based on the reference genome is `gw_2_count_6cats.py`, with batch script to submit jobs to slurm `step6_gw_2_6cats.sh`.
+
+After this is run, run the R script `step6_combine_chrom.R`. Then, within the `output/gw_2_count/6st` directory run:
+
+```{bash}
+for file in non_*; do mv "$file" "${file#non_}";done;
+```
+
+Finally, run the script `step6_3cats.R` to condense sub-categories.
