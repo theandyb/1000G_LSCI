@@ -2,6 +2,7 @@ src/slurm/**
 output/**
 *.fna*
 *.Rproj
+*.zip
 
 # History files
 .Rhistory
