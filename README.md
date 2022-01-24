@@ -86,3 +86,10 @@ for file in non_*; do mv "$file" "${file#non_}";done;
 ```
 
 Finally, run the script `step6_3cats.R` to condense sub-categories.
+
+
+# Addendums
+
+## 24 Jan 2022
+
+* Added scripts to sample GC_NN controls that do not account for CpG/non-CpG status (`src/control_sample_all_gc.py`)
