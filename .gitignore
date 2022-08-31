@@ -1,3 +1,4 @@
+reference_data/*
 src/slurm/**
 output/**
 *.fna*

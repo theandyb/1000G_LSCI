@@ -4,14 +4,13 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1GB
 #SBATCH --time=01:30:00
-#SBATCH --job-name=sample_GC
-#SBATCH --partition=nomosix
+#SBATCH --job-name=SAS
 #SBATCH --array=1-22
 #SBATCH --requeue
-#SBATCH -e slurm/step3_GC-%J.err
-#SBATCH -o slurm/step3_GC-%J.out
+#SBATCH -e slurm/step3_GC_SAS-%J.err
+#SBATCH -o slurm/step3_GC_SAS-%J.out
 
-POP='ALL'
+POP='SAS'
 
 echo "GC ${SLURM_ARRAY_TASK_ID} $POP"
 python /net/snowwhite/home/beckandy/research/1000G_LSCI/src/control_sample_all_gc.py \

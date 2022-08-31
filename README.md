@@ -4,6 +4,30 @@ In this repository one can find the scripts we used to analyize the distribution
 
 We assume that the vcf files have already been filtered to only include the 2,504 unrelated individuals in the 1000G dataset; the list of ids for these samples is in the file `reference_data/sample_ids.txt`
 
+## Getting GC content in windows
+
+```{bash, eval=FALSE}
+curl -s http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes | \
+  grep -Ev "_|X|Y|M" > reference_data/hg38.chrom.sizes
+  
+bedtools makewindows -g reference_data/hg38.chrom.sizes -w 1000000 | grep -Ev "_|X|Y|M" | sort -k 1,1V -k2,2n > reference_data/genome.1000kb.sorted.bed
+
+bedtools makewindows -g reference_data/hg38.chrom.sizes -w 5000000 | grep -Ev "_|X|Y|M" | sort -k 1,1V -k2,2n > reference_data/genome.5000kb.sorted.bed
+
+bedtools makewindows -g reference_data/hg38.chrom.sizes -w 100000 | grep -Ev "_|X|Y|M" | sort -k 1,1V -k2,2n > reference_data/genome.100kb.sorted.bed
+
+bedtools makewindows -g reference_data/hg38.chrom.sizes -w 10000 | grep -Ev "_|X|Y|M" | sort -k 1,1V -k2,2n > reference_data/genome.10kb.sorted.bed
+
+bedtools makewindows -g reference_data/hg38.chrom.sizes -w 1000 | grep -Ev "_|X|Y|M" | sort -k 1,1V -k2,2n > reference_data/genome.1kb.sorted.bed
+
+# GC content
+bedtools nuc -fi reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -bed reference_data/genome.1kb.sorted.bed > reference_data/gc1kb.bed
+
+bedtools nuc -fi reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -bed reference_data/genome.10kb.sorted.bed > reference_data/gc10kb.bed
+
+bedtools nuc -fi reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -bed reference_data/genome.100kb.sorted.bed > reference_data/gc100kb.bed
+```
+
 # Step 1: Generate singleton files
 
 Here we'll generate singleton files for each of the five super-populations, along with a singleton file for all 2,504 unrelated samples in the 1000G sample. We do this using a chain of calls to `bcftools view` and `vcftools --singletons`. Batch scripts to perform these operations are in the `src` directory in the scripts named `step1_singletons_{POP}.sh`.
@@ -67,6 +91,16 @@ awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv > GC_CG.txt
 awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_AT.txt
 awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv > cpg_GC_TA.txt
 awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.txt
+```
+
+## UPDATE (31-Jan-2022)
+
+Run the following in the `output/controls/ALL` subdirectory to generate the control file for the GC_AT subtype when we ignore CpG status when sampling controls:
+
+```{bash}
+awk -F, '{if($4 == "GC_AT" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_AT.txt
+awk -F, '{if($4 == "GC_TA" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_TA.txt
+awk -F, '{if($4 == "GC_CG" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_CG.txt
 ```
 
 # Step 5: Genome-wide Background Rates - Single Position Models

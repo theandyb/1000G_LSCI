@@ -3,13 +3,12 @@
 #SBATCH --mail-user=beckandy@umich.edu
 #SBATCH --ntasks=1
 #SBATCH --mem=1GB
-#SBATCH --time=01:30:00
-#SBATCH --job-name=sample_GC
-#SBATCH --partition=nomosix
+#SBATCH --time=01:45:00
+#SBATCH --job-name=ALL
 #SBATCH --array=1-22
 #SBATCH --requeue
-#SBATCH -e slurm/step3_GC-%J.err
-#SBATCH -o slurm/step3_GC-%J.out
+#SBATCH -e slurm/ALL_GC-%J.err
+#SBATCH -o slurm/ALL_GC-%J.out
 
 POP='ALL'
 

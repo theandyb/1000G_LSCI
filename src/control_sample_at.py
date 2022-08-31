@@ -63,71 +63,40 @@ def main(ref_prefix = "chr"):
     print("Done!")
 
 def sample_control(chrom, pos, ref, cat, seq, nSample, window=150, bp=10):
-    sites1 = []
-    sites2 = []
-    newlist = []
-    while(len(sites1) + len(sites2) < nSample + 5):
-        lseg_lb = max((pos-1-window-bp), 0)
-        lseg_ub = pos - bp - 1
-        useg_lb = pos + bp
-        useg_ub = upBound = min(len(seq), pos + window + bp)
-        subseq1 = seq[lseg_lb:lseg_ub]
-        subseq2 = seq[useg_lb:useg_ub]
-        subseq1 = re.sub(r'^N+', '', subseq1)
-        subseq2 = re.sub(r'N+$', '', subseq2)
-        sites1 = [m.start() for m in re.finditer(ref, subseq1)]
-        sites2 = [m.start() for m in re.finditer(ref, subseq2)]
-        sites1 = [s for s in sites1 if (s >= bp+1 and s < (len(subseq1)-bp - 1))]
-        sites2 = [s for s in sites2 if (s >= bp+1 and s < (len(subseq2)-bp -1))]
-        window += 50 #expand window in edge case where mut_site is only ref_allele in window
-    window -= 50
-    while len(newlist) < nSample:
-        flip = random.randint(0, 1)
-        if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
-            subseq = subseq1
-            sites = sites1
-            c_direction = -1
-        else:
-            subseq = subseq2
-            sites = sites2
-            c_direction = 1
-        if(len(sites)==0):
-            print("Bad pos: {}".format(pos))
-        ix = random.choice(sites)
-        newSeq = subseq[(ix - bp):(ix+bp+1)]
-        if not re.search("[NYRATCG]{21}", newSeq): # THIS CHANGED!
-            #print(pos)
-            sites.remove(ix)
-            try:
-                if c_direction == -1:
-                    sites1.remove(ix)
-                else:
-                    sites2.remove(ix)
-            except ValueError: 
-                print("EYORE: Could not remove index {} from list of sites".format(ix))
-                print("Newseq = {}".format(newSeq))
-            continue
-        if c_direction == -1:
-            distance = window + bp - ix
-        else:
-            distance = bp + ix
-        motif2 = full_motif(newSeq, ref)
-        entry = {
-            'chrom' : chrom,
-            'pos' : pos,
-            'motif' : newSeq,
-            'cat': cat,
-            'ref': ref,
-            'window': window,
-            'distance': distance,
-            'motif2':motif2
-        }
-        newlist.append(entry)
-        if c_direction == -1:
-            sites1.remove(ix)
-        else:
-            sites2.remove(ix)
-    return newlist
+  sites = []
+  newlist = []
+  while(len(sites) < nSample + 5):
+    #lseg_lb = max((pos-1-window-bp), 0)
+    #useg_ub = upBound = min(len(seq), pos + window + bp)
+    #subseq = seq[lseg_lb:useg_ub]
+    subseq = seq[(pos - 1 - window):(pos+window)]
+    subseq = re.sub(r'^N+', '', subseq)
+    sites = [m.start() for m in re.finditer(ref, subseq)]
+    sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)]
+    window += 50 #expand window in edge case where mut_site is only ref_allele in window
+  window -= 50
+  while len(newlist) < nSample:
+    ix = random.choice(sites)
+    chrom_ix = ix - window + pos
+    try:
+      newSeq = seq[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
+      distance = abs(ix - window)
+      motif2 = full_motif(newSeq, ref)
+      entry = {
+        'chrom' : chrom,
+        'pos' : pos,
+        'motif' : newSeq,
+        'cat': cat,
+        'ref': ref,
+        'window': window,
+        'distance': distance,
+        'motif2':motif2
+      }
+      newlist.append(entry)
+    except ValueError:
+      print("Edge Case: position " + str(pos))
+    sites.remove(ix)
+  return newlist
 
 
 

@@ -4,7 +4,9 @@ import pandas as pd
 from Bio.Seq import Seq
 
 def get_motif(seqstr, pos, bp = 10):
-    return seqstr[(pos - bp):(pos + bp + 1)]
+    """Get the motif centered at a position from VCF"""
+    pyix = pos - 1 # python is index 0, versus 1 for VCF
+    return seqstr[(pyix - bp):(pyix + bp + 1)]
 
 def full_cat(ref, alt, motif, bp = 10):
     nuc_dict = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
@@ -56,7 +58,7 @@ with open(singleton_file) as fp:
         pos = int(data[1])
         alt = data[3]
         subject = data[4]
-        motif = get_motif(seqstr, pos-1)
+        motif = get_motif(seqstr, pos)
         ref = seqstr[(pos-1)]
         cat = "{}>{}".format(ref, alt)
         motif_full = full_motif(motif, ref)

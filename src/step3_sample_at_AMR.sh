@@ -4,12 +4,11 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1GB
 #SBATCH --time=01:30:00
-#SBATCH --job-name=sample_AT
-#SBATCH --partition=nomosix
+#SBATCH --job-name=AMR
 #SBATCH --array=1-22
 #SBATCH --requeue
-#SBATCH -e slurm/step3_AT-%J.err
-#SBATCH -o slurm/step3_AT-%J.out
+#SBATCH -e slurm/step3_AT-%a.err
+#SBATCH -o slurm/step3_AT-%a.out
 
 POP='AMR'
 

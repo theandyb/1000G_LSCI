@@ -50,7 +50,7 @@ def main(ref_prefix = "chr"):
                 line = fp.readline()
                 continue
                 
-            output_list.extend(sample_control(chrom, pos, ref, cat, seq, nSample, seqstr))
+            output_list.extend(sample_control(chrom, pos, ref, cat, nSample, seqstr))
             line = fp.readline()
             counter += 1
             if counter % 10000 == 0:
@@ -63,65 +63,28 @@ def main(ref_prefix = "chr"):
         pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
     print("Done!")
 
-def sample_control(chrom, pos, ref, cat, seq, nSample, seqstr, window=150, bp=10):
-    sites1 = []
-    sites2 = []
+def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
+    sites = []
     newlist = []
     if ref == "C":
         search_str = "C"
     else:
         search_str = "G"
         
-    while(len(sites1) + len(sites2) < nSample + 5):
-        # Break 300bp into two halves, separated by 21-mer centered at POS
-        lseg_lb = max((pos-1-window-bp), 0)
-        lseg_ub = pos - bp - 1
-        useg_lb = pos + bp
-        useg_ub = upBound = min(len(seq), pos + window + bp)
-        subseq1 = seqstr[lseg_lb:lseg_ub]
-        subseq2 = seqstr[useg_lb:useg_ub]
-        subseq1 = re.sub(r'^N+', '', subseq1) # Trim Ns at beginning or end of sequence
-        subseq2 = re.sub(r'N+$', '', subseq2)
-        sites1 = [m.start() for m in re.finditer(search_str, subseq1, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
-        sites2 = [m.start() for m in re.finditer(search_str, subseq2, overlapped=True)]
-        sites1 = [s for s in sites1 if (s >= bp+1 and s < (len(subseq1)-bp-1))] # Identify all possible motifs to sample from
-        sites2 = [s for s in sites2 if (s >= bp+1 and s < (len(subseq2)-bp-1))]
+    while(len(sites) < nSample + 1):
+        subseq = seqstr[(pos - 1 - window):(pos+window)]
+        sites = [m.start() for m in re.finditer(search_str, subseq, overlapped=True)] # These two lines were changed for CpG/non-CpG sampling
+        sites = [s for s in sites if (s > bp+window+1 or s < window-bp-1)] # Identify all possible motifs to sample from
         window += 50 #expand window in edge case where mut_site is only ref_allele in window
     window -= 50
     while len(newlist) < nSample:
-        flip = random.randint(0, 1)
-        if ((flip == 0 and len(sites1)>0) or (len(sites2)==0)):
-            subseq = subseq1
-            sites = sites1
-            c_direction = -1
-        else:
-            subseq = subseq2
-            sites = sites2
-            c_direction = 1
         if(len(sites)==0):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
-        if ref == "C":
-            newSeq = subseq[(ix - bp):(ix+bp+1)]
-        else:
-            newSeq = subseq[(ix + 1 - bp):(ix+bp+2)]
-        if not re.search("[NYRATCG]{21}", newSeq): # THIS CHANGED!
-            #print(pos)
-            sites.remove(ix)
-            try:
-                if c_direction == -1:
-                    sites1.remove(ix)
-                else:
-                    sites2.remove(ix)
-            except ValueError: 
-                print("EYORE: Could not remove index {} from list of sites".format(ix))
-                print("Newseq = {}".format(newSeq))
-            continue
-        if c_direction == -1:
-            distance = window + bp - ix
-        else:
-            distance = window + ix
-        motif2 = full_motif(newSeq, ref)
+        chrom_ix = ix - window + pos
+        newSeq = seqstr[(chrom_ix - bp):(chrom_ix+bp+1)].upper()
+        motif2 = full_motif(newSeq, newSeq[bp])
+        distance = abs(ix - window)
         entry = {
             'chrom' : chrom,
             'pos' : pos,
@@ -133,10 +96,7 @@ def sample_control(chrom, pos, ref, cat, seq, nSample, seqstr, window=150, bp=10
             'motif2':motif2
         }
         newlist.append(entry)
-        if c_direction == -1:
-            sites1.remove(ix)
-        else:
-            sites2.remove(ix)
+        sites.remove(ix)
     return newlist
 
 
