@@ -82,7 +82,7 @@ def sample_control(chrom, pos, ref, cat, nSample, seqstr, window=150, bp=10):
             print("Bad pos: {}".format(pos))
         ix = random.choice(sites)
         chrom_ix = ix - window + pos
-        newSeq = seqstr[(chrom_ix - bp):(chrom_ix+bp+1)].upper()
+        newSeq = seqstr[(chrom_ix - bp - 1):(chrom_ix+bp)].upper()
         motif2 = full_motif(newSeq, newSeq[bp])
         distance = abs(ix - window)
         entry = {

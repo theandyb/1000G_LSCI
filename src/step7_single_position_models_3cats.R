@@ -157,12 +157,13 @@ for(sp in c("ALL", "AFR", "AMR", "EAS", "EUR", "SAS")){
 
 
 ## ADDITION: 31-Jan-2022
-all_GC_AT_data <- function(rp){
-  df_s1 <- get_singleton_pos("GC_AT", rp, "ALL")
-  df_s2 <- get_singleton_pos("cpg_GC_AT", rp, "ALL")
+all_GC_data <- function(rp, st, pop){
+  st_cpg <- paste0("cpg_", st)
+  df_s1 <- get_singleton_pos(st, rp, pop)
+  df_s2 <- get_singleton_pos(st_cpg, rp, pop)
   df_s <- bind_rows(df_s1, df_s2)
 
-  df_c <- get_control_pos("all_GC_AT", rp, "ALL")
+  df_c <- get_control_pos(paste0("all_", st), rp, pop)
   df <- full_join(df_s, df_c, by = "Nuc") %>%
     mutate(p_c = controls / sum(controls)) %>%
     mutate(exp_s = sum(singletons) * p_c) %>%
@@ -171,18 +172,24 @@ all_GC_AT_data <- function(rp){
   return(df)
 }
 
-registerDoParallel(20)
-results <- foreach(x = c(-10:-1,1:10), .combine = 'rbind') %dopar% {
-  all_GC_AT_data(x)
-}
-stopImplicitCluster()
+for(sp in c("ALL", "AFR", "AMR", "EAS", "EUR", "SAS")){
+  print(sp)
+  for(st in c("GC_AT", "GC_TA", "GC_CG")){
+    print(st)
+    registerDoParallel(20)
+    results <- foreach(x = c(-10:-1,1:10), .combine = 'rbind') %dopar% {
+      all_GC_data(x, st, sp)
+    }
+    stopImplicitCluster()
 
-out_dir <- paste0("/net/snowwhite/home/beckandy/research/1000G_LSCI/output/single_pos_df/ALL/")
-df <- results
-for(i in c(-10:-1,1:10)){
-  df2 <- df %>%
-    filter(rp == i) %>%
-    select(-rp)
-  out_file <- paste0(out_dir, "all_GC_AT", "_rp", i, ".csv")
-  write_csv(df2, out_file)
+    out_dir <- paste0("/net/snowwhite/home/beckandy/research/1000G_LSCI/output/single_pos_df/",sp,"/")
+    df <- results
+    for(i in c(-10:-1,1:10)){
+      df2 <- df %>%
+        filter(rp == i) %>%
+        select(-rp)
+      out_file <- paste0(out_dir, "all_", st, "_rp", i, ".csv")
+      write_csv(df2, out_file)
+    }
+  }
 }
