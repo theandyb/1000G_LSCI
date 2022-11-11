@@ -28,6 +28,12 @@ def main(ref_prefix = "chr"):
     chrom = args.chrom
     nSample = args.nSample
     output_list = []
+    # Addition: 10-Nov-22
+    out_file = args.output
+    min_list = []
+    max_list = []
+    min_file = out_file + ".min"
+    max_file = out_file + ".max"
     # Create fasta object
     fasta_obj = Fasta(ref_file)
     seq = fasta_obj["{}{}".format(ref_prefix, chrom)] # hg37 has chromosomes indexed without the text "chr", whereas hg38 does 
@@ -55,21 +61,34 @@ def main(ref_prefix = "chr"):
             else:
                 cpg_bool = False
             
-            new_line = sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr)
-            if new_line == 0:
+            new_entry = sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr)
+            if new_entry == 0:
               bad_sites += 1
             else:
-              output_list.extend(new_line)
+              output_list.extend(new_entry)
+              # Find control with minimum and maximum distance
+              min_dist = min([t.get("distance") for t in new_entry])
+              max_dist = max([t.get("distance") for t in new_entry])
+              min_entry = [t for t in new_entry if t.get('distance') == min_dist]
+              max_entry = [t for t in new_entry if t.get('distance') == max_dist ]
+              min_list.extend(min_entry)
+              max_list.extend(max_entry)
             line = fp.readline()
             counter += 1
             if counter % 10000 == 0 and output_list:
                 print(counter)
-                df = pd.DataFrame(output_list)
-                df.to_csv(args.output, index = None, header=False, mode='a')
+                pd.DataFrame(output_list).to_csv(out_file, index = None, header=False, mode='a')
                 output_list = []
+                # New: add min and max files
+                pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+                min_list = []
+                pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
+                max_list = []
     print("Done sampling...")
     if output_list:
-        pd.DataFrame(output_list).to_csv(args.output, index = None, header=False, mode='a')
+        pd.DataFrame(output_list).to_csv(out_file, index = None, header=False, mode='a')
+        pd.DataFrame(min_list).to_csv(min_file, index = None, header=False, mode='a')
+        pd.DataFrame(max_list).to_csv(max_file, index = None, header=False, mode='a')
     print("Done!")
     print("Number singletons without matched controls: " + str(bad_sites))
     print("Total singletons: " + str(counter))
@@ -111,7 +130,8 @@ def sample_control(chrom, pos, ref, cat, nSample, cpg_bool, seqstr, window=150, 
         'ref': ref,
         'window': window,
         'distance': distance,
-        'motif2':motif2
+        'motif2':motif2,
+        'spos': chrom_ix
       }
       newlist.append(entry)
     except:
