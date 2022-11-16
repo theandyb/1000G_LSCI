@@ -103,6 +103,98 @@ awk -F, '{if($4 == "GC_TA" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_al
 awk -F, '{if($4 == "GC_CG" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_CG.txt
 ```
 
+## UPDATE (10-Nov-2022)
+
+Get subtype files for nearest and furthest control
+
+```{bash}
+awk -F, '{if($4 == "AT_CG")print(substr($8,1,21))}' chr*_at.csv.min > AT_CG_min.txt
+awk -F, '{if($4 == "AT_GC")print(substr($8,1,21))}' chr*_at.csv.min > AT_GC_min.txt
+awk -F, '{if($4 == "AT_TA")print(substr($8,1,21))}' chr*_at.csv.min > AT_TA_min.txt
+awk -F, '{if($4 == "GC_AT")print(substr($8,1,21))}' chr*_gc.csv.min > GC_AT_min.txt
+awk -F, '{if($4 == "GC_TA")print(substr($8,1,21))}' chr*_gc.csv.min > GC_TA_min.txt
+awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv.min > GC_CG_min.txt
+awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_AT_min.txt
+awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_TA_min.txt
+awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv.min > cpg_GC_CG_min.txt
+
+awk -F, '{if($4 == "AT_CG")print(substr($8,1,21))}' chr*_at.csv.max > AT_CG_max.txt
+awk -F, '{if($4 == "AT_GC")print(substr($8,1,21))}' chr*_at.csv.max > AT_GC_max.txt
+awk -F, '{if($4 == "AT_TA")print(substr($8,1,21))}' chr*_at.csv.max > AT_TA_max.txt
+awk -F, '{if($4 == "GC_AT")print(substr($8,1,21))}' chr*_gc.csv.max > GC_AT_max.txt
+awk -F, '{if($4 == "GC_TA")print(substr($8,1,21))}' chr*_gc.csv.max > GC_TA_max.txt
+awk -F, '{if($4 == "GC_CG")print(substr($8,1,21))}' chr*_gc.csv.max > GC_CG_max.txt
+awk -F, '{if($4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_AT_max.txt
+awk -F, '{if($4 == "cpg_GC_TA")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_TA_max.txt
+awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv.max > cpg_GC_CG_max.txt
+```
+
+## UPDATE (15 Nov 2022)
+
+Get position files
+
+### Controls
+
+```{bash}
+for i in `seq 1 22`; do
+echo "AT_CG..."
+awk -F, '{if($4 == "AT_CG")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_CG_${i}.txt"
+echo "AT_GC..."
+awk -F, '{if($4 == "AT_GC")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_GC_${i}.txt"
+echo "AT_TA..."
+awk -F, '{if($4 == "AT_TA")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_TA_${i}.txt"
+done
+
+for i in `seq 1 22`; do
+echo "GC_AT..."
+awk -F, '{if($4 == "GC_AT")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_AT_${i}.txt"
+echo "GC_TA..."
+awk -F, '{if($4 == "GC_TA")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_TA_${i}.txt"
+echo "GC_CG..."
+awk -F, '{if($4 == "GC_CG")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_CG_${i}.txt"
+done
+
+for i in `seq 1 22`; do
+echo "GC_AT..."
+awk -F, '{if($4 == "cpg_GC_AT")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+echo "GC_TA..."
+awk -F, '{if($4 == "cpg_GC_TA")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+echo "GC_CG..."
+awk -F, '{if($4 == "cpg_GC_CG")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+done
+```
+
+### Singletons
+
+```{bash}
+for i in `seq 1 22`; do
+echo "AT_CG..."
+awk -F, '{if($9 == "AT_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_CG_${i}.txt"
+echo "AT_GC..."
+awk -F, '{if($9 == "AT_GC")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_GC_${i}.txt"
+echo "AT_TA..."
+awk -F, '{if($9 == "AT_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_TA_${i}.txt"
+done
+
+for i in `seq 1 22`; do
+echo "GC_AT..."
+awk -F, '{if($9 == "GC_AT")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_AT_${i}.txt"
+echo "GC_TA..."
+awk -F, '{if($9 == "GC_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_TA_${i}.txt"
+echo "GC_CG..."
+awk -F, '{if($9 == "GC_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_CG_${i}.txt"
+done
+
+for i in `seq 1 22`; do
+echo "GC_AT..."
+awk -F, '{if($9 == "cpg_GC_AT")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+echo "GC_TA..."
+awk -F, '{if($9 == "cpg_GC_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+echo "GC_CG..."
+awk -F, '{if($9 == "cpg_GC_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+done
+```
+
 # Step 5: Genome-wide Background Rates - Single Position Models
 
 The scripts to generate counts based on the reference genome are `gw_1_count3cats.py` and `gw_1_count_6cats.py`. Batch scripts to submit jobs to slurm are `step5_gw_1_count_3cat_batch.sh` and `step5_gw_1_count_6cat_batch.sh`.
