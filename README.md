@@ -28,6 +28,32 @@ bedtools nuc -fi reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna 
 bedtools nuc -fi reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -bed reference_data/genome.100kb.sorted.bed > reference_data/gc100kb.bed
 ```
 
+# Step 0: Mask reference genome
+
+An important step I initially neglected was to mask the variant sites from 1KGP in the reference genome
+prior to sampling the control samples. Woops. Let's do that:
+
+The process will be:
+
+1. Convert VCF to list of variant sites (BED) using `vcf2bed`
+2. Mask the reference genome using the `maskfasta` option of `bedtools`
+
+`step0_vcf2bed.sh` will generate a bed file for each chromosome with variant site locations.
+
+A simple script will combine these into one file (with proper chromosome sorting):
+
+```{bash}
+for i in `seq 1 22`; do
+cat chr${i}.bed >> 1kgp_sites.bed
+done
+```
+
+And now we can mask our fasta file (and index it):
+
+```{bash}
+bedtools maskfasta -fi /net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -bed /net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/vcfbed/1kgp_sites.bed -fo /net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/grch38_1kgp_var_mask.fa
+```
+
 # Step 1: Generate singleton files
 
 Here we'll generate singleton files for each of the five super-populations, along with a singleton file for all 2,504 unrelated samples in the 1000G sample. We do this using a chain of calls to `bcftools view` and `vcftools --singletons`. Batch scripts to perform these operations are in the `src` directory in the scripts named `step1_singletons_{POP}.sh`.
