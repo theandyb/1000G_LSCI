@@ -4,13 +4,13 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1GB
 #SBATCH --time=01:45:00
-#SBATCH --job-name=ALL
+#SBATCH --job-name=EAS
 #SBATCH --array=1-22
 #SBATCH --requeue
-#SBATCH -e slurm/ALL_GC-%J.err
-#SBATCH -o slurm/ALL_GC-%J.out
+#SBATCH -e slurm/EAS_GC-%J.err
+#SBATCH -o slurm/EAS_GC-%J.out
 
-POP='ALL'
+POP='SAS'
 
 echo "GC ${SLURM_ARRAY_TASK_ID} $POP"
 python /net/snowwhite/home/beckandy/research/1000G_LSCI/src/control_sample_gc.py \

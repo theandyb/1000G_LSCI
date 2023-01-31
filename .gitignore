@@ -4,6 +4,7 @@ output/**
 *.fna*
 *.Rproj
 *.zip
+scratch/100bp_sp/
 
 .ipynb_checkpoints/**
 .ipynb_checkpoints

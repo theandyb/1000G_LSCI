@@ -124,9 +124,9 @@ awk -F, '{if($4 == "cpg_GC_CG")print(substr($8,1,21))}' chr*_gc.csv> cpg_GC_CG.t
 Run the following in the `output/controls/ALL` subdirectory to generate the control file for the GC_AT subtype when we ignore CpG status when sampling controls:
 
 ```{bash}
-awk -F, '{if($4 == "GC_AT" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_AT.txt
-awk -F, '{if($4 == "GC_TA" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_TA.txt
-awk -F, '{if($4 == "GC_CG" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_all_gc.csv > all_GC_CG.txt
+awk -F, '{if($4 == "GC_AT" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_AT.txt
+awk -F, '{if($4 == "GC_TA" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_TA.txt
+awk -F, '{if($4 == "GC_CG" || $4 == "cpg_GC_AT")print(substr($8,1,21))}' chr*_gc_all.csv > all_GC_CG.txt
 ```
 
 ## UPDATE (10-Nov-2022)
@@ -163,30 +163,50 @@ Get position files
 
 ```{bash}
 for i in `seq 1 22`; do
+echo $i
 echo "AT_CG..."
-awk -F, '{if($4 == "AT_CG")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_CG_${i}.txt"
+awk -F, '{if($4 == "AT_CG" && $5 == "A")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_CG_${i}.txt"
+awk -F, '{if($4 == "AT_CG" && $5 == "T")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_CG_rev_${i}.txt"
+
 echo "AT_GC..."
-awk -F, '{if($4 == "AT_GC")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_GC_${i}.txt"
+awk -F, '{if($4 == "AT_GC" && $5 == "A")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_GC_${i}.txt"
+awk -F, '{if($4 == "AT_GC" && $5 == "T")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_GC_rev_${i}.txt"
+
 echo "AT_TA..."
-awk -F, '{if($4 == "AT_TA")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_TA_${i}.txt"
+awk -F, '{if($4 == "AT_TA" && $5 == "A")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_TA_${i}.txt"
+awk -F, '{if($4 == "AT_TA" && $5 == "T")print($9)}' "chr${i}_at.csv" >> pos_files/"AT_TA_rev_${i}.txt"
+
 done
 
 for i in `seq 1 22`; do
+echo $i
 echo "GC_AT..."
-awk -F, '{if($4 == "GC_AT")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_AT_${i}.txt"
+awk -F, '{if($4 == "GC_AT" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_AT_${i}.txt"
+awk -F, '{if($4 == "GC_AT" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_AT_rev_${i}.txt"
+
 echo "GC_TA..."
-awk -F, '{if($4 == "GC_TA")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_TA_${i}.txt"
+awk -F, '{if($4 == "GC_TA" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_TA_${i}.txt"
+awk -F, '{if($4 == "GC_TA" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_TA_rev_${i}.txt"
+
 echo "GC_CG..."
-awk -F, '{if($4 == "GC_CG")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_CG_${i}.txt"
+awk -F, '{if($4 == "GC_CG" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_CG_${i}.txt"
+awk -F, '{if($4 == "GC_CG" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"GC_CG_rev_${i}.txt"
+
 done
 
 for i in `seq 1 22`; do
+echo $i
 echo "GC_AT..."
-awk -F, '{if($4 == "cpg_GC_AT")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_AT" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_AT" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_AT_rev_${i}.txt"
+
 echo "GC_TA..."
-awk -F, '{if($4 == "cpg_GC_TA")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_TA" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_TA" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_TA_rev_${i}.txt"
+
 echo "GC_CG..."
-awk -F, '{if($4 == "cpg_GC_CG")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_CG" && $5 == "C")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+awk -F, '{if($4 == "cpg_GC_CG" && $5 == "G")print($9)}' "chr${i}_gc.csv" >> pos_files/"cpg_GC_CG_rev_${i}.txt"
 done
 ```
 
@@ -195,29 +215,45 @@ done
 ```{bash}
 for i in `seq 1 22`; do
 echo "AT_CG..."
-awk -F, '{if($9 == "AT_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_CG_${i}.txt"
+awk -F, '{if($9 == "AT_CG" && $7 == "A")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_CG_${i}.txt"
+awk -F, '{if($9 == "AT_CG" && $7 == "T")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_CG_rev_${i}.txt"
+
 echo "AT_GC..."
-awk -F, '{if($9 == "AT_GC")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_GC_${i}.txt"
+awk -F, '{if($9 == "AT_GC" && $7 == "A")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_GC_${i}.txt"
+awk -F, '{if($9 == "AT_GC" && $7 == "T")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_GC_rev_${i}.txt"
+
 echo "AT_TA..."
-awk -F, '{if($9 == "AT_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_TA_${i}.txt"
+awk -F, '{if($9 == "AT_TA" && $7 == "A")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_TA_${i}.txt"
+awk -F, '{if($9 == "AT_TA" && $7 == "T")print($2)}' "chr${i}_annotated.csv" >> pos_files/"AT_TA_rev_${i}.txt"
 done
 
 for i in `seq 1 22`; do
 echo "GC_AT..."
-awk -F, '{if($9 == "GC_AT")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_AT_${i}.txt"
+awk -F, '{if($9 == "GC_AT" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_AT_${i}.txt"
+awk -F, '{if($9 == "GC_AT" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_AT_rev_${i}.txt"
+
 echo "GC_TA..."
-awk -F, '{if($9 == "GC_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_TA_${i}.txt"
+awk -F, '{if($9 == "GC_TA" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_TA_${i}.txt"
+awk -F, '{if($9 == "GC_TA" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_TA_rev_${i}.txt"
+
 echo "GC_CG..."
-awk -F, '{if($9 == "GC_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_CG_${i}.txt"
+awk -F, '{if($9 == "GC_CG" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_CG_${i}.txt"
+awk -F, '{if($9 == "GC_CG" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"GC_CG_rev_${i}.txt"
 done
 
 for i in `seq 1 22`; do
+echo $i
 echo "GC_AT..."
-awk -F, '{if($9 == "cpg_GC_AT")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_AT" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_AT_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_AT" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_AT_rev_${i}.txt"
+
 echo "GC_TA..."
-awk -F, '{if($9 == "cpg_GC_TA")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_TA" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_TA_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_TA" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_TA_rev_${i}.txt"
+
 echo "GC_CG..."
-awk -F, '{if($9 == "cpg_GC_CG")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_CG" && $7 == "C")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_CG_${i}.txt"
+awk -F, '{if($9 == "cpg_GC_CG" && $7 == "G")print($2)}' "chr${i}_annotated.csv" >> pos_files/"cpg_GC_CG_rev_${i}.txt"
 done
 ```
 

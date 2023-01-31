@@ -4,13 +4,13 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=1GB
 #SBATCH --time=01:30:00
-#SBATCH --job-name=ALL
+#SBATCH --job-name=EAS
 #SBATCH --array=1-22
 #SBATCH --requeue
-#SBATCH -e slurm/step3_ATall-%a.err
-#SBATCH -o slurm/step3_ATall-%a.out
+#SBATCH -e slurm/step3_ATeas-%a.err
+#SBATCH -o slurm/step3_ATeas-%a.out
 
-POP='ALL'
+POP='SAS'
 
 echo "AT ${SLURM_ARRAY_TASK_ID}"
 python /net/snowwhite/home/beckandy/research/1000G_LSCI/src/control_sample_at.py \

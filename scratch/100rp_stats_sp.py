@@ -22,6 +22,12 @@ def s_pos(subtype, chromosome):
   pos_list = pd.read_csv(f_name, header=0, names = ['pos'], usecols=['pos'], squeeze = True)
   return pos_list
 
+def complement(nucleotide):
+  complements = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+  if not nucleotide in complements.keys():
+    return nucleotide
+  return complements[nucleotide]
+
 ray.init(num_cpus=22)
 
 @ray.remote
@@ -36,12 +42,18 @@ def get_count_table_control(chromosome, subtype, offset):
   ref_file = "/net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
   fasta_obj = Fasta(ref_file)
   control_pos = c_pos(subtype, chromosome)
+  rev_control_pos = c_pos(subtype + "_rev", chromosome)
   seq = fasta_obj["{}{}".format("chr", chromosome)]
   seqstr = seq[0:len(seq)].seq
   results = {"A":0, "C":0, "G":0, "T":0}
   for index, value in control_pos.items():
     ix = value - 1 + offset
     nuc = seqstr[ix]
+    if nuc in results.keys():
+      results[nuc] += 1
+  for index, value in rev_control_pos.items():
+    ix = value - 1 + (offset * -1)
+    nuc = complement(seqstr[ix])
     if nuc in results.keys():
       results[nuc] += 1
   return(results)
@@ -56,6 +68,7 @@ def get_count_table_singletons(chromosome, subtype, offset):
   that can maybe be passed around?
   """
   singleton_pos = s_pos(subtype, chromosome)
+  rev_singleton_pos = s_pos(subtype + "_rev", chromosome)
   ref_file = "/net/snowwhite/home/beckandy/research/1000G_LSCI/reference_data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
   fasta_obj = Fasta(ref_file)
   seq = fasta_obj["{}{}".format("chr", chromosome)]
@@ -64,6 +77,11 @@ def get_count_table_singletons(chromosome, subtype, offset):
   for index, value in singleton_pos.items():
     ix = value - 1 + offset
     nuc = seqstr[ix]
+    if nuc in results.keys():
+      results[nuc] += 1
+  for index, value in rev_singleton_pos.items():
+    ix = value - 1 + (offset * -1)
+    nuc = complement(seqstr[ix])
     if nuc in results.keys():
       results[nuc] += 1
   return(results)
